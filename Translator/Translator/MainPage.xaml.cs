@@ -22,19 +22,9 @@ namespace Translator
         }
         async void TakePhoto(object sender, EventArgs e)
         {
-            var client = new HttpClient();
-            string text = "text="+"apple";
-            string lang = "lang="+"en-zh";
-            string translatorKey = "key="+"trnsl.1.1.20170505T130736Z.9886d1e879de6303.6a534fd32397ecba37a3c120449d094ba135e6a1";
-            string uri = "https://translate.yandex.net/api/v1.5/tr.json/translate?" + translatorKey +"&"+ text+"&" + lang;
             Button button = sender as Button;
             button.Text = "You click it";
-            //HttpResponseMessage response = await client.GetAsync(uri);
-            string result = await client.GetStringAsync(uri);
 
-            var translatedTextModel = JsonConvert.DeserializeObject<TranslateTextModel>(result);
-            string translatedText = translatedTextModel.TranslatedText[0];
-            
             if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
             {
                 await DisplayAlert("No Camera", ":( No camera avaialble.", "OK");
@@ -77,7 +67,7 @@ namespace Translator
                         }
                     }
                 }
-                if (textMsg == "")
+                /*if (textMsg == "")
                 {
                     HandwritingRecognitionOperation handWriteOp = await VisionServiceClient.CreateHandwritingRecognitionOperationAsync(stream);
                     HandwritingRecognitionOperationResult handWriteResult = await VisionServiceClient.GetHandwritingRecognitionOperationResultAsync(handWriteOp);
@@ -91,18 +81,36 @@ namespace Translator
                         }
                     }
 
-                }
+                }*/
 
                 await DisplayAlert("Your text:", textMsg,"Cancel");
+                var client = new HttpClient();
+                string text = "text=" + textMsg;
+                string lang = "lang=" + "en-zh";
+                string translatorKey = "key=" + "trnsl.1.1.20170505T130736Z.9886d1e879de6303.6a534fd32397ecba37a3c120449d094ba135e6a1";
+                string uri = "https://translate.yandex.net/api/v1.5/tr.json/translate?" + translatorKey + "&" + text + "&" + lang;
+                
+                //HttpResponseMessage response = await client.GetAsync(uri);
+                string result = await client.GetStringAsync(uri);
+
+                var translatedTextModel = JsonConvert.DeserializeObject<TranslateTextModel>(result);
+                string translatedTextMsg = "";
+                //string[] translatedText = translatedTextModel.TranslatedText;
+                foreach (string translatedText in translatedTextModel.TranslatedText)
+                {
+                    translatedTextMsg += translatedText;
+                }
+                await DisplayAlert("Translated Text:", translatedTextMsg, "Cancel");
                 /*while (analysisResult.Description.Captions[i] != null)
                 {
                    string textmsg = analysisResult.Description.Captions[i].Text;
                     i++;
                 }*/
-                
-               
-                
-            }catch (Exception ex)
+
+
+
+            }
+            catch (Exception ex)
             {
 
             }
