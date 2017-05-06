@@ -8,24 +8,28 @@ using Plugin.Media.Abstractions;
 using Plugin.Media;
 using Microsoft.ProjectOxford.Vision;
 using Microsoft.ProjectOxford.Vision.Contract;
-using System.IO;
-using System.Net.Http.Headers;
 using System.Net.Http;
 using Newtonsoft.Json;
 namespace Translator
 {
+    /// <summary>
+    /// The main page of the translator app.
+    /// </summary>
     public partial class MainPage : ContentPage
     {
         public MainPage()
         {
             InitializeComponent();
         }
-        async void TakePhoto(object sender, EventArgs e)
+        /// <summary>
+        /// When the user click the button (defined in the xaml file), this method is called to take the photo and translate the text in the photo
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void TakePhoto(object sender, EventArgs e)
         {
-            Button button = sender as Button;
-            button.Text = "You click it";
-
-            if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
+            //Set up the camera permission.
+           if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
             {
                 await DisplayAlert("No Camera", ":( No camera avaialble.", "OK");
                 return;
@@ -42,21 +46,16 @@ namespace Translator
             {
                 return;
             }
-            else
-            {
-                //await DisplayAlert("Name", file.Path, "djfadsklj");
-                //var result = await UploadAndAnalyzeImage("https://en.wikipedia.org/wiki/Shogi#/media/File:Shogi_board_pieces_and_komadai.jpg");
-            }
+            
             try
             {
-                VisionServiceClient VisionServiceClient = new VisionServiceClient("3bd57c38ada74daeb2d11c859f1c36bb");
-                //VisualFeature[] visualFeatures = new VisualFeature[] { VisualFeature.Adult, VisualFeature.Categories, VisualFeature.Color, VisualFeature.Description, VisualFeature.Faces, VisualFeature.ImageType, VisualFeature.Tags };
-                string textMsg="";
-                var stream = file.GetStream();
-                //AnalysisResult analysisResult = await VisionServiceClient.AnalyzeImageAsync(stream, visualFeatures);
-                //var captions = analysisResult.Description.Captions;
-                OcrResults textResult = await VisionServiceClient.RecognizeTextAsync(stream, "en", true);
+                //initizlize the text message. It is a string of the recognized text from the computer vision api
+                string textMsg = "";
+
+                //Get the ocr result from the UploadAndAnalyzeImage();
+                OcrResults textResult = await UploadAndAnalyzeImage(file);
                 
+                //Loop through the text result and parse it in a single string.
                 foreach (Region region in textResult.Regions)
                 {
                     foreach (Line line in region.Lines)
@@ -67,7 +66,101 @@ namespace Translator
                         }
                     }
                 }
-                /*if (textMsg == "")
+                
+                //Display the text msg.
+                //In progress: change the ui to allow autocorrect or manually correct.
+                await DisplayAlert("Your text:", textMsg,"Cancel");
+
+                //In progress: Allow the user to discard the image.
+
+                //use the yandex translator api to get the string of response json object.
+                string result = await UploadAndTranslate(textMsg);
+
+                //Deserialize the json object and string the translated text msg into a string array.
+                var translatedTextModel = JsonConvert.DeserializeObject<TranslateTextModel>(result);
+
+                //initialize the translated text msg string. Ready to be parsed.
+                string translatedTextMsg = "";
+                
+                //Loop through every string in the string array to parse the string.
+                foreach (string translatedText in translatedTextModel.TranslatedText)
+                {
+                    translatedTextMsg += translatedText;
+                }
+
+                //Display the final result.
+                await DisplayAlert("Translated Text:", translatedTextMsg, "Cancel");
+                
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+        }
+        /// <summary>
+        /// Upload a text string to Yandex translator api to return a json string containing the translation;
+        /// </summary>
+        /// <param name="textMsg"></param>
+        /// <returns></returns>
+        private async Task<string> UploadAndTranslate(string textMsg)
+        {
+            try
+            {
+                //Create a http client
+                var client = new HttpClient();
+
+                //Set up the require parameter (i.e. text to translated, language to use, and the subscription key)
+                string text = "text=" + textMsg;
+                string lang = "lang=" + "en-zh";
+                string translatorKey = "key=" + "trnsl.1.1.20170505T130736Z.9886d1e879de6303.6a534fd32397ecba37a3c120449d094ba135e6a1";
+
+                //Parse it into a string of url 
+                string url = "https://translate.yandex.net/api/v1.5/tr.json/translate?" + translatorKey + "&" + text + "&" + lang;
+
+                //HttpResponseMessage response = await client.GetAsync(url);
+
+                //retrieve the json object and store it as a single string
+                string result = await client.GetStringAsync(url);
+                return result;
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+        }
+        /// <summary>
+        /// Upload a media image file to microsoft computer vision api to get ocr result.
+        /// Ocr result is a analysis of word recognition in an image.
+        /// return the ocr result to get the text.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        private async Task<OcrResults> UploadAndAnalyzeImage(MediaFile file)
+        {
+            try
+            {
+                //Set up the computer vision client.
+                VisionServiceClient VisionServiceClient = new VisionServiceClient("3bd57c38ada74daeb2d11c859f1c36bb");
+                //VisualFeature[] visualFeatures = new VisualFeature[] { VisualFeature.Adult, VisualFeature.Categories, VisualFeature.Color, VisualFeature.Description, VisualFeature.Faces, VisualFeature.ImageType, VisualFeature.Tags };
+                
+                //Convert the image into file stream
+                var stream = file.GetStream();
+                //AnalysisResult analysisResult = await VisionServiceClient.AnalyzeImageAsync(stream, visualFeatures);
+                //var captions = analysisResult.Description.Captions;
+
+                //get the ocr result from the api
+                OcrResults textResult = await VisionServiceClient.RecognizeTextAsync(stream, "en", true);
+                return textResult;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            //Not finished. It is used to recognize handwritten text.
+
+            /*if (textMsg == "")
                 {
                     HandwritingRecognitionOperation handWriteOp = await VisionServiceClient.CreateHandwritingRecognitionOperationAsync(stream);
                     HandwritingRecognitionOperationResult handWriteResult = await VisionServiceClient.GetHandwritingRecognitionOperationResultAsync(handWriteOp);
@@ -82,56 +175,7 @@ namespace Translator
                     }
 
                 }*/
-
-                await DisplayAlert("Your text:", textMsg,"Cancel");
-                var client = new HttpClient();
-                string text = "text=" + textMsg;
-                string lang = "lang=" + "en-zh";
-                string translatorKey = "key=" + "trnsl.1.1.20170505T130736Z.9886d1e879de6303.6a534fd32397ecba37a3c120449d094ba135e6a1";
-                string uri = "https://translate.yandex.net/api/v1.5/tr.json/translate?" + translatorKey + "&" + text + "&" + lang;
-                
-                //HttpResponseMessage response = await client.GetAsync(uri);
-                string result = await client.GetStringAsync(uri);
-
-                var translatedTextModel = JsonConvert.DeserializeObject<TranslateTextModel>(result);
-                string translatedTextMsg = "";
-                //string[] translatedText = translatedTextModel.TranslatedText;
-                foreach (string translatedText in translatedTextModel.TranslatedText)
-                {
-                    translatedTextMsg += translatedText;
-                }
-                await DisplayAlert("Translated Text:", translatedTextMsg, "Cancel");
-                /*while (analysisResult.Description.Captions[i] != null)
-                {
-                   string textmsg = analysisResult.Description.Captions[i].Text;
-                    i++;
-                }*/
-
-
-
-            }
-            catch (Exception ex)
-            {
-
-            }
-
         }
         
-        /*private async Task<AnalysisResult> UploadAndAnalyzeImage(string imageFilePath)
-        {
-            // -----------------------------------------------------------------------
-            // KEY SAMPLE CODE STARTS HERE
-            // -----------------------------------------------------------------------  
-            //
-            // Create Project Oxford Computer Vision API Service client
-            //
-            VisionServiceClient VisionServiceClient = new VisionServiceClient("3bd57c38ada74daeb2d11c859f1c36bb");
-            VisualFeature[] visualFeatures = new VisualFeature[] { VisualFeature.Adult, VisualFeature.Categories, VisualFeature.Color, VisualFeature.Description, VisualFeature.Faces, VisualFeature.ImageType, VisualFeature.Tags };
-            AnalysisResult analysisResult = await VisionServiceClient.AnalyzeImageAsync(imageFilePath, visualFeatures);
-            return analysisResult;
-
-
-
-        }*/
     }
 }
