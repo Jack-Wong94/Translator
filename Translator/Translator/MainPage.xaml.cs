@@ -46,56 +46,60 @@ namespace Translator
             {
                 return;
             }
-            
-            try
+            if (!this.IsBusy)
             {
-                //initizlize the text message. It is a string of the recognized text from the computer vision api
-                string textMsg = "";
-
-                //Get the ocr result from the UploadAndAnalyzeImage();
-                OcrResults textResult = await UploadAndAnalyzeImage(file);
-                
-                //Loop through the text result and parse it in a single string.
-                foreach (Region region in textResult.Regions)
+                try
                 {
-                    foreach (Line line in region.Lines)
+                    this.IsBusy = true;
+                    //initizlize the text message. It is a string of the recognized text from the computer vision api
+                    string textMsg = "";
+
+                    //Get the ocr result from the UploadAndAnalyzeImage();
+                    OcrResults textResult = await UploadAndAnalyzeImage(file);
+                    this.IsBusy = false;
+                    //Loop through the text result and parse it in a single string.
+                    foreach (Region region in textResult.Regions)
                     {
-                        foreach (Word word in line.Words)
+                        foreach (Line line in region.Lines)
                         {
-                            textMsg += word.Text + " ";
+                            foreach (Word word in line.Words)
+                            {
+                                textMsg += word.Text + " ";
+                            }
                         }
                     }
+
+                    //Display the text msg.
+                    //In progress: change the ui to allow autocorrect or manually correct.
+                    await DisplayAlert("Your text:", textMsg, "Cancel");
+
+                    //In progress: Allow the user to discard the image.
+
+                    //use the yandex translator api to get the string of response json object.
+                    string result = await UploadAndTranslate(textMsg);
+
+                    //Deserialize the json object and string the translated text msg into a string array.
+                    var translatedTextModel = JsonConvert.DeserializeObject<TranslateTextModel>(result);
+
+                    //initialize the translated text msg string. Ready to be parsed.
+                    string translatedTextMsg = "";
+
+                    //Loop through every string in the string array to parse the string.
+                    foreach (string translatedText in translatedTextModel.TranslatedText)
+                    {
+                        translatedTextMsg += translatedText;
+                    }
+
+                    //Display the final result.
+                    await DisplayAlert("Translated Text:", translatedTextMsg, "Cancel");
+
                 }
-                
-                //Display the text msg.
-                //In progress: change the ui to allow autocorrect or manually correct.
-                await DisplayAlert("Your text:", textMsg,"Cancel");
-
-                //In progress: Allow the user to discard the image.
-
-                //use the yandex translator api to get the string of response json object.
-                string result = await UploadAndTranslate(textMsg);
-
-                //Deserialize the json object and string the translated text msg into a string array.
-                var translatedTextModel = JsonConvert.DeserializeObject<TranslateTextModel>(result);
-
-                //initialize the translated text msg string. Ready to be parsed.
-                string translatedTextMsg = "";
-                
-                //Loop through every string in the string array to parse the string.
-                foreach (string translatedText in translatedTextModel.TranslatedText)
+                catch (Exception ex)
                 {
-                    translatedTextMsg += translatedText;
+
                 }
-
-                //Display the final result.
-                await DisplayAlert("Translated Text:", translatedTextMsg, "Cancel");
-                
             }
-            catch (Exception ex)
-            {
-
-            }
+            
 
         }
         /// <summary>

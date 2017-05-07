@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Translator"
-             x:Class="Translator.MainPage">
+             x:Class="Translator.MainPage"
+             x:Name="MainPage">
 
     <StackLayout>
         <Button Text="Take a photo"
@@ -11,6 +12,9 @@
                 Clicked="TakePhoto">
             
         </Button>
+        <ActivityIndicator IsVisible="{Binding Source={x:Reference MainPage}, Path=IsBusy}" 
+                           IsRunning="{Binding Source={x:Reference MainPage}, Path=IsBusy}" />
+
     </StackLayout>
 	
 
