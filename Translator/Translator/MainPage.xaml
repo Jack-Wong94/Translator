@@ -12,10 +12,12 @@
                 Clicked="TakePhoto">
             
         </Button>
-        <Button Text="Test the connection"
+        <Button Text="Retrieve data from the DB"
                 Clicked="Button_Clicked"/>
         <Button Text="Add vocab to db"
                 Clicked="Button_Clicked_1"/>
+        <Button Text="Find structure "
+                Clicked="Button_Clicked_2"/>
         <ActivityIndicator IsVisible="{Binding Source={x:Reference MainPage}, Path=IsBusy}" 
                            IsRunning="{Binding Source={x:Reference MainPage}, Path=IsBusy}" />
 

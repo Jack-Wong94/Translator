@@ -201,5 +201,18 @@ namespace Translator
             };
             await AzureManager.AzureManagerInstance.AddVocabModel(vocabModel);
         }
+
+        private async void Button_Clicked_2(object sender, EventArgs e)
+        {
+            try
+            {
+                var client = new HttpClient();
+                string SourceText = "I love apple";
+                string uri = "https://api.textgain.com/1/tag?lang=en&q="+SourceText;
+                string result = await client.GetStringAsync(uri);
+
+            }
+            catch (Exception) { }
+        }
     }
 }
