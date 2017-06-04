@@ -182,9 +182,14 @@ namespace Translator
                 }*/
         }
 
-        private void Button_Clicked(object sender, EventArgs e)
+        private async void Button_Clicked(object sender, EventArgs e)
         {
-            MobileServiceClient client = new MobileServiceClient("http://translatorjw.azurewebsites.net");
+
+            /*MobileServiceClient client = new MobileServiceClient("http://translatorjw.azurewebsites.net");
+            //IMobileServiceTable<FaceBookModel> model = client.GetTable<FaceBookModel>();
+            IMobileServiceTable<VocabModel> vocabTable = client.GetTable<VocabModel>();
+            var content = await vocabTable.ToListAsync();*/
+            var content = await AzureManager.AzureManagerInstance.GetVocabModel();
         }
     }
 }
