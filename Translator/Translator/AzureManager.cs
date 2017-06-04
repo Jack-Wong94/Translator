@@ -35,5 +35,9 @@ namespace Translator
         {
             return await this.vocabTable.ToListAsync();
         }
+        public async Task AddVocabModel(VocabModel vocabModel)
+        {
+            await this.vocabTable.InsertAsync(vocabModel);
+        }
     }
 }

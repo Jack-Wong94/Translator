@@ -191,5 +191,15 @@ namespace Translator
             var content = await vocabTable.ToListAsync();*/
             var content = await AzureManager.AzureManagerInstance.GetVocabModel();
         }
+
+        private async void Button_Clicked_1(object sender, EventArgs e)
+        {
+            VocabModel vocabModel = new VocabModel()
+            {
+                SourceText = "book",
+                TranslateText = "書"
+            };
+            await AzureManager.AzureManagerInstance.AddVocabModel(vocabModel);
+        }
     }
 }

@@ -17,7 +17,7 @@ namespace Translator
         public string SourceText { get; set; }
 
         [JsonProperty(PropertyName = "TranslateText")]
-        public string gender { get; set; }
+        public string TranslateText { get; set; }
 
 
     }

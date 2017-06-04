@@ -14,6 +14,8 @@
         </Button>
         <Button Text="Test the connection"
                 Clicked="Button_Clicked"/>
+        <Button Text="Add vocab to db"
+                Clicked="Button_Clicked_1"/>
         <ActivityIndicator IsVisible="{Binding Source={x:Reference MainPage}, Path=IsBusy}" 
                            IsRunning="{Binding Source={x:Reference MainPage}, Path=IsBusy}" />
 
