@@ -10,6 +10,7 @@ using Microsoft.ProjectOxford.Vision;
 using Microsoft.ProjectOxford.Vision.Contract;
 using System.Net.Http;
 using Newtonsoft.Json;
+using Microsoft.WindowsAzure.MobileServices;
 namespace Translator
 {
     /// <summary>
@@ -180,6 +181,10 @@ namespace Translator
 
                 }*/
         }
-        
+
+        private void Button_Clicked(object sender, EventArgs e)
+        {
+            MobileServiceClient client = new MobileServiceClient("http://translatorjw.azurewebsites.net");
+        }
     }
 }

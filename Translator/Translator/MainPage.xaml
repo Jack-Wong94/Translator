@@ -7,11 +7,13 @@
 
     <StackLayout>
         <Button Text="Take a photo"
-                VerticalOptions="CenterAndExpand"
-                HorizontalOptions="CenterAndExpand"
+                VerticalOptions="EndAndExpand"
+                
                 Clicked="TakePhoto">
             
         </Button>
+        <Button Text="Test the connection"
+                Clicked="Button_Clicked"/>
         <ActivityIndicator IsVisible="{Binding Source={x:Reference MainPage}, Path=IsBusy}" 
                            IsRunning="{Binding Source={x:Reference MainPage}, Path=IsBusy}" />
 
