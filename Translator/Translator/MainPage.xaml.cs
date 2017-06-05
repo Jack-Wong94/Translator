@@ -208,9 +208,20 @@ namespace Translator
             {
                 var client = new HttpClient();
                 string SourceText = "I love apple";
-                string uri = "https://api.textgain.com/1/tag?lang=en&q="+SourceText;
+                string uri = "https://api.textgain.com/1/tag?lang=en&q=" + SourceText;
                 string result = await client.GetStringAsync(uri);
                 var s = (Text)JsonConvert.DeserializeObject(result, typeof(Text));
+                foreach(List<List<WordType>> section in s.data)
+                {
+                    foreach(List<WordType> sentence in section)
+                    {
+                        foreach(WordType wordType in sentence)
+                        {
+                            string word = wordType.word;
+                            string tag = wordType.tag;
+                        }
+                    }
+                }
             }
             catch (Exception) { }
         }
