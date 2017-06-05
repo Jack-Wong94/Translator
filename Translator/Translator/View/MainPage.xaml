@@ -21,6 +21,11 @@
         <Button x:Name="loginButton"
                 Text="Login using fb"
                 Clicked="loginButton_Clicked"/>
+        <Button x:Name="logoutButton"
+                Text="Log out"
+                Clicked="logoutButton_Clicked"/>
+        <Button Text="User id"
+                Clicked="ShowUserId"/>
         <ActivityIndicator IsVisible="{Binding Source={x:Reference MainPage}, Path=IsBusy}" 
                            IsRunning="{Binding Source={x:Reference MainPage}, Path=IsBusy}" />
 

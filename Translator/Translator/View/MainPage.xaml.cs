@@ -33,7 +33,7 @@ namespace Translator
         private async void TakePhoto(object sender, EventArgs e)
         {
             //Set up the camera permission.
-           if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
+            if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
             {
                 await DisplayAlert("No Camera", ":( No camera avaialble.", "OK");
                 return;
@@ -106,7 +106,7 @@ namespace Translator
 
                 }
             }
-            
+
 
         }
         /// <summary>
@@ -135,7 +135,7 @@ namespace Translator
                 string result = await client.GetStringAsync(url);
                 return result;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return null;
             }
@@ -154,7 +154,7 @@ namespace Translator
                 //Set up the computer vision client.
                 VisionServiceClient VisionServiceClient = new VisionServiceClient("3bd57c38ada74daeb2d11c859f1c36bb");
                 //VisualFeature[] visualFeatures = new VisualFeature[] { VisualFeature.Adult, VisualFeature.Categories, VisualFeature.Color, VisualFeature.Description, VisualFeature.Faces, VisualFeature.ImageType, VisualFeature.Tags };
-                
+
                 //Convert the image into file stream
                 var stream = file.GetStream();
                 //AnalysisResult analysisResult = await VisionServiceClient.AnalyzeImageAsync(stream, visualFeatures);
@@ -202,7 +202,7 @@ namespace Translator
         {
             VocabModel vocabModel = new VocabModel()
             {
-                SourceText = "book",
+                SourceText = "orange",
                 TranslateText = "書"
             };
             await AzureManager.AzureManagerInstance.AddVocabModel(vocabModel);
@@ -236,6 +236,7 @@ namespace Translator
             catch (Exception) { }
         }
         bool authenticated = false;
+        MobileServiceUser user;
         protected override void OnAppearing()
         {
             base.OnAppearing();
@@ -243,7 +244,7 @@ namespace Translator
             string token = CrossSettings.Current.GetValueOrDefault("token", "");
             if (!token.Equals("") && !userId.Equals(""))
             {
-                MobileServiceUser user = new MobileServiceUser(userId);
+                user = new MobileServiceUser(userId);
                 user.MobileServiceAuthenticationToken = token;
 
                 AzureManager.AzureManagerInstance.AzureClient.CurrentUser = user;
@@ -252,7 +253,7 @@ namespace Translator
             }
             if (authenticated == true)
             {
-                this.loginButton.IsVisible = false;
+                //this.loginButton.IsVisible = false;
             }
         }
         private async void loginButton_Clicked(object sender, EventArgs e)
@@ -264,12 +265,25 @@ namespace Translator
             }
             if (authenticated == true)
             {
-                this.loginButton.IsVisible = false;
+                //this.loginButton.IsVisible = false;
                 CrossSettings.Current.AddOrUpdateValue("user", AzureManager.AzureManagerInstance.AzureClient.CurrentUser.UserId);
                 CrossSettings.Current.AddOrUpdateValue("token", AzureManager.AzureManagerInstance.AzureClient.CurrentUser.MobileServiceAuthenticationToken);
             }
         }
+        private async void logoutButton_Clicked(object sender, EventArgs e)
+        {
+            bool loggedOut = false;
+
+            if (App.Authenticator != null)
+            {
+                loggedOut = await App.Authenticator.LogoutAsync();
+
+            }
+        }
+
+        private async void ShowUserId(object sender, EventArgs e)
+        {
+            await DisplayAlert("User name", CrossSettings.Current.GetValueOrDefault("user", ""), "Cancel");
+        }
     }
-    
-    
 }

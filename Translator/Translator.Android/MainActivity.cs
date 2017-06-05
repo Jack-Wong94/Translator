@@ -11,6 +11,8 @@ using Plugin.Permissions;
 using Microsoft.WindowsAzure.MobileServices;
 using System.Threading.Tasks;
 using static Translator.App;
+using Android.Webkit;
+
 namespace Translator.Droid
 {
     [Activity(Label = "Translator", Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
@@ -53,6 +55,22 @@ namespace Translator.Droid
             builder.SetMessage(message);
             builder.SetTitle("Sign-in result");
             builder.Create().Show();
+            return success;
+        }
+
+        public async Task<bool> LogoutAsync()
+        {
+            var message = string.Empty;
+            var success = false;
+            try
+            {
+                CookieManager.Instance.RemoveAllCookie();
+                await AzureManager.AzureManagerInstance.AzureClient.LogoutAsync();
+                success = true;
+            }catch(Exception ex)
+            {
+                message = ex.Message;
+            }
             return success;
         }
     }

@@ -18,6 +18,7 @@ namespace Translator
         public interface IAuthenticate
         {
             Task<bool> Authenticate();
+            Task<bool> LogoutAsync();
         }
         public static IAuthenticate Authenticator { get; private set; }
         public static void Init(IAuthenticate authenticator)
