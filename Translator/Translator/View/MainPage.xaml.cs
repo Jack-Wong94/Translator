@@ -70,6 +70,9 @@ namespace Translator
                         }
                     }
 
+                    //use the FindWordType() to find out the word type of the text.
+                    FindWordType(textMsg);
+
                     //Display the text msg.
                     //In progress: change the ui to allow autocorrect or manually correct.
                     await DisplayAlert("Your text:", textMsg, "Cancel");
@@ -95,7 +98,7 @@ namespace Translator
                     await DisplayAlert("Translated Text:", translatedTextMsg, "Cancel");
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                 }
@@ -129,7 +132,7 @@ namespace Translator
                 string result = await client.GetStringAsync(url);
                 return result;
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 return null;
             }
@@ -182,7 +185,7 @@ namespace Translator
                 }*/
         }
 
-        private async void Button_Clicked(object sender, EventArgs e)
+        private async void BtnGetVocab(object sender, EventArgs e)
         {
 
             /*MobileServiceClient client = new MobileServiceClient("http://translatorjw.azurewebsites.net");
@@ -192,7 +195,7 @@ namespace Translator
             var content = await AzureManager.AzureManagerInstance.GetVocabModel();
         }
 
-        private async void Button_Clicked_1(object sender, EventArgs e)
+        private async void BtnAddVocab(object sender, EventArgs e)
         {
             VocabModel vocabModel = new VocabModel()
             {
@@ -202,20 +205,24 @@ namespace Translator
             await AzureManager.AzureManagerInstance.AddVocabModel(vocabModel);
         }
 
-        private async void Button_Clicked_2(object sender, EventArgs e)
+        private void BtnFindWordType(object sender, EventArgs e)
+        {
+            FindWordType("I love apple. It is my favourite fruit");
+        }
+        private async void FindWordType(string text)
         {
             try
             {
                 var client = new HttpClient();
-                string SourceText = "I love apple";
+                string SourceText = text;
                 string uri = "https://api.textgain.com/1/tag?lang=en&q=" + SourceText;
                 string result = await client.GetStringAsync(uri);
                 var s = (Text)JsonConvert.DeserializeObject(result, typeof(Text));
-                foreach(List<List<WordType>> section in s.data)
+                foreach (List<List<WordType>> section in s.data)
                 {
-                    foreach(List<WordType> sentence in section)
+                    foreach (List<WordType> sentence in section)
                     {
-                        foreach(WordType wordType in sentence)
+                        foreach (WordType wordType in sentence)
                         {
                             string word = wordType.word;
                             string tag = wordType.tag;

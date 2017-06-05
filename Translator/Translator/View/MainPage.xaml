@@ -13,11 +13,11 @@
             
         </Button>
         <Button Text="Retrieve data from the DB"
-                Clicked="Button_Clicked"/>
+                Clicked="BtnGetVocab"/>
         <Button Text="Add vocab to db"
-                Clicked="Button_Clicked_1"/>
+                Clicked="BtnAddVocab"/>
         <Button Text="Find structure "
-                Clicked="Button_Clicked_2"/>
+                Clicked="BtnFindWordType"/>
         <ActivityIndicator IsVisible="{Binding Source={x:Reference MainPage}, Path=IsBusy}" 
                            IsRunning="{Binding Source={x:Reference MainPage}, Path=IsBusy}" />
 
