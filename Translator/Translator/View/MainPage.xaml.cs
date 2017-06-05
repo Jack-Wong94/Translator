@@ -158,7 +158,7 @@ namespace Translator
                 OcrResults textResult = await VisionServiceClient.RecognizeTextAsync(stream, "en", true);
                 return textResult;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -226,19 +226,6 @@ namespace Translator
             catch (Exception) { }
         }
     }
-    public class Text
-    {
-        [JsonProperty(PropertyName = "text")]
-        public List<List<List<WordType>>> data { get; set; }
-
-        
-    }
-    public class WordType
-    {
-        [JsonProperty(PropertyName = "word")]
-        public string word { get; set; }
-
-        [JsonProperty(PropertyName = "tag")]
-        public string tag { get; set; }
-    }
+    
+    
 }
