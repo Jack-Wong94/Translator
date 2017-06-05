@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Translator
@@ -15,7 +15,15 @@ namespace Translator
 
             MainPage = new Translator.MainPage();
         }
-
+        public interface IAuthenticate
+        {
+            Task<bool> Authenticate();
+        }
+        public static IAuthenticate Authenticator { get; private set; }
+        public static void Init(IAuthenticate authenticator)
+        {
+            Authenticator = authenticator;
+        }
         protected override void OnStart()
         {
             // Handle when your app starts

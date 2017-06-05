@@ -18,6 +18,9 @@
                 Clicked="BtnAddVocab"/>
         <Button Text="Find structure "
                 Clicked="BtnFindWordType"/>
+        <Button x:Name="loginButton"
+                Text="Login using fb"
+                Clicked="loginButton_Clicked"/>
         <ActivityIndicator IsVisible="{Binding Source={x:Reference MainPage}, Path=IsBusy}" 
                            IsRunning="{Binding Source={x:Reference MainPage}, Path=IsBusy}" />
 

@@ -10,6 +10,9 @@ using Microsoft.ProjectOxford.Vision;
 using Microsoft.ProjectOxford.Vision.Contract;
 using System.Net.Http;
 using Newtonsoft.Json;
+
+//Use for facebook login
+using Plugin.Settings;
 using Microsoft.WindowsAzure.MobileServices;
 namespace Translator
 {
@@ -231,6 +234,40 @@ namespace Translator
                 }
             }
             catch (Exception) { }
+        }
+        bool authenticated = false;
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            string userId = CrossSettings.Current.GetValueOrDefault("user", "");
+            string token = CrossSettings.Current.GetValueOrDefault("token", "");
+            if (!token.Equals("") && !userId.Equals(""))
+            {
+                MobileServiceUser user = new MobileServiceUser(userId);
+                user.MobileServiceAuthenticationToken = token;
+
+                AzureManager.AzureManagerInstance.AzureClient.CurrentUser = user;
+
+                authenticated = true;
+            }
+            if (authenticated == true)
+            {
+                this.loginButton.IsVisible = false;
+            }
+        }
+        private async void loginButton_Clicked(object sender, EventArgs e)
+        {
+            //int x = 0;
+            if (App.Authenticator != null)
+            {
+                authenticated = await App.Authenticator.Authenticate();
+            }
+            if (authenticated == true)
+            {
+                this.loginButton.IsVisible = false;
+                CrossSettings.Current.AddOrUpdateValue("user", AzureManager.AzureManagerInstance.AzureClient.CurrentUser.UserId);
+                CrossSettings.Current.AddOrUpdateValue("token", AzureManager.AzureManagerInstance.AzureClient.CurrentUser.MobileServiceAuthenticationToken);
+            }
         }
     }
     
