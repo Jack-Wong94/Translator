@@ -210,9 +210,24 @@ namespace Translator
                 string SourceText = "I love apple";
                 string uri = "https://api.textgain.com/1/tag?lang=en&q="+SourceText;
                 string result = await client.GetStringAsync(uri);
-
+                var s = (Text)JsonConvert.DeserializeObject(result, typeof(Text));
             }
             catch (Exception) { }
         }
+    }
+    public class Text
+    {
+        [JsonProperty(PropertyName = "text")]
+        public List<List<List<WordType>>> data { get; set; }
+
+        
+    }
+    public class WordType
+    {
+        [JsonProperty(PropertyName = "word")]
+        public string word { get; set; }
+
+        [JsonProperty(PropertyName = "tag")]
+        public string tag { get; set; }
     }
 }
