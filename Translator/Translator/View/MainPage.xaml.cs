@@ -41,7 +41,7 @@ namespace Translator
             var file = await CrossMedia.Current.TakePhotoAsync(new Plugin.Media.Abstractions.StoreCameraMediaOptions
             {
                 DefaultCamera = Plugin.Media.Abstractions.CameraDevice.Front,
-                Directory = "Moodify",
+                Directory = "Translator",
                 Name = $"{DateTime.UtcNow}.jpg",
                 CompressionQuality = 92
             });

@@ -13,7 +13,7 @@ namespace Translator
         {
             InitializeComponent();
 
-            MainPage = new Translator.MainPage();
+            MainPage = new Translator.TabsPage();
         }
         public interface IAuthenticate
         {

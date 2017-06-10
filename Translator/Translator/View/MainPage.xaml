@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Translator"
              x:Class="Translator.MainPage"
-             x:Name="MainPage">
+             x:Name="MainPage"
+             Title="Main">
 
     <StackLayout>
         <Button Text="Take a photo"
