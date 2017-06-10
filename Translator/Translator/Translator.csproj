@@ -42,7 +42,11 @@
     <Compile Include="CustomVision.xaml.cs">
       <DependentUpon>CustomVision.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DataModel\NotHotdogModel\NotHotDogModel.cs" />
     <Compile Include="Helpers\Settings.cs" />
+    <Compile Include="InformationPage.xaml.cs">
+      <DependentUpon>InformationPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TabsPage.xaml.cs">
       <DependentUpon>TabsPage.xaml</DependentUpon>
     </Compile>
@@ -127,6 +131,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CustomVision.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="InformationPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>

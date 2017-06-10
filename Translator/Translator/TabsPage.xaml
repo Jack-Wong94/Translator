@@ -6,5 +6,6 @@
     x:Class="Translator.TabsPage">
     <local:MainPage />
     <local:CustomVision/>
+    <local:InformationPage/>
 
 </TabbedPage>
