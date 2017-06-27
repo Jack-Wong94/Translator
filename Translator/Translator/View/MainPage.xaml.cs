@@ -192,11 +192,16 @@ namespace Translator
             //IMobileServiceTable<FaceBookModel> model = client.GetTable<FaceBookModel>();
             IMobileServiceTable<VocabModel> vocabTable = client.GetTable<VocabModel>();
             var content = await vocabTable.ToListAsync();*/
-
-            var content = await AzureManager.AzureManagerInstance.GetVocabModel();
+            string result = null;
+            List<VocabModel> content = await AzureManager.AzureManagerInstance.GetVocabModel();
+            foreach (VocabModel model in content)
+            {
+                result += model.SourceText+"\n";
+            }
+            await DisplayAlert("Learned Vocab", result, "Ok");
         }
 
-        private async void BtnAddVocab(object sender, EventArgs e)
+       /* private async void BtnAddVocab(object sender, EventArgs e)
         {
             VocabModel vocabModel = new VocabModel()
             {
@@ -209,11 +214,12 @@ namespace Translator
         private void BtnFindWordType(object sender, EventArgs e)
         {
             FindWordType("I love apple. It is my favourite fruit");
-        }
+        }*/
         private async void FindWordType(string text)
         {
             try
             {
+                this.IsBusy = true;
                 var client = new HttpClient();
                 string SourceText = text;
                 string uri = "https://api.textgain.com/1/tag?lang=en&q=" + SourceText;
@@ -227,9 +233,19 @@ namespace Translator
                         {
                             string word = wordType.word;
                             string tag = wordType.tag;
+                            if (tag == "NOUN")
+                            {
+                                VocabModel vocabModel = new VocabModel()
+                                {
+                                    SourceText = word
+                                    
+                                };
+                                await AzureManager.AzureManagerInstance.AddVocabModel(vocabModel);
+                            }
                         }
                     }
                 }
+                this.IsBusy = false;
             }
             catch (Exception) { }
         }
