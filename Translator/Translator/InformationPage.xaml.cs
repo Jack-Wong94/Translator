@@ -18,36 +18,27 @@ namespace Translator
         public InformationPage()
         {
             InitializeComponent();
-            BindingContext = new InformationPageViewModel();
+            
+        }
+        private async void BtnGetVocab(object sender, EventArgs e)
+        {
+
+            /*MobileServiceClient client = new MobileServiceClient("http://translatorjw.azurewebsites.net");
+            //IMobileServiceTable<FaceBookModel> model = client.GetTable<FaceBookModel>();
+            IMobileServiceTable<VocabModel> vocabTable = client.GetTable<VocabModel>();
+            var content = await vocabTable.ToListAsync();*/
+            var content = await AzureManager.AzureManagerInstance.GetVocabModel();
+        }
+
+        private async void BtnAddVocab(object sender, EventArgs e)
+        {
+            VocabModel vocabModel = new VocabModel()
+            {
+                SourceText = "orange",
+                TranslateText = "書"
+            };
+            await AzureManager.AzureManagerInstance.AddVocabModel(vocabModel);
         }
     }
-
-    class InformationPageViewModel : INotifyPropertyChanged
-    {
-
-        public InformationPageViewModel()
-        {
-            IncreaseCountCommand = new Command(IncreaseCount);
-        }
-
-        int count;
-
-        string countDisplay = "You clicked 0 times.";
-        public string CountDisplay
-        {
-            get { return countDisplay; }
-            set { countDisplay = value; OnPropertyChanged(); }
-        }
-
-        public ICommand IncreaseCountCommand { get; }
-
-        void IncreaseCount() =>
-            CountDisplay = $"You clicked {++count} times";
-
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        void OnPropertyChanged([CallerMemberName]string propertyName = "") =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    }
+    
 }
