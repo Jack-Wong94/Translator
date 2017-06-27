@@ -192,6 +192,7 @@ namespace Translator
             //IMobileServiceTable<FaceBookModel> model = client.GetTable<FaceBookModel>();
             IMobileServiceTable<VocabModel> vocabTable = client.GetTable<VocabModel>();
             var content = await vocabTable.ToListAsync();*/
+
             var content = await AzureManager.AzureManagerInstance.GetVocabModel();
         }
 
