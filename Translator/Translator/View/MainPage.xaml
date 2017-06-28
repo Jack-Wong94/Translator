@@ -12,7 +12,7 @@
                 Clicked="TakePhoto">
             
         </Button>
-        <Button Text="Retrieve data from the DB"
+        <Button Text="Revise Vocab"
                 Clicked="BtnGetVocab"/>
         
         <ActivityIndicator IsVisible="{Binding Source={x:Reference MainPage}, Path=IsBusy}" 
