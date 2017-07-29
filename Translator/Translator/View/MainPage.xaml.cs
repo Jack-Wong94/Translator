@@ -35,10 +35,11 @@ namespace Translator
                 await DisplayAlert("No Camera", ":( No camera avaialble.", "OK");
                 return;
             }
+           //save the photo to a directory
             var file = await CrossMedia.Current.TakePhotoAsync(new Plugin.Media.Abstractions.StoreCameraMediaOptions
             {
                 DefaultCamera = Plugin.Media.Abstractions.CameraDevice.Front,
-                Directory = "Moodify",
+                Directory = "Translator",
                 Name = $"{DateTime.UtcNow}.jpg",
                 CompressionQuality = 92
             });
@@ -47,6 +48,7 @@ namespace Translator
             {
                 return;
             }
+            //Process the photo
             if (!this.IsBusy)
             {
                 try
@@ -96,7 +98,7 @@ namespace Translator
 
                     //Display the final result.
                     await DisplayAlert("Translated Text:", translatedTextMsg, "Cancel");
-
+                    this.IsBusy = false;
                 }
                 catch (Exception)
                 {
@@ -107,7 +109,7 @@ namespace Translator
 
         }
         /// <summary>
-        /// Upload a text string to Yandex translator api to return a json string containing the translation;
+        /// Upload a text string to Yandex translator api to return a json string containing the translation.
         /// </summary>
         /// <param name="textMsg"></param>
         /// <returns></returns>
@@ -126,7 +128,6 @@ namespace Translator
                 //Parse it into a string of url 
                 string url = "https://translate.yandex.net/api/v1.5/tr.json/translate?" + translatorKey + "&" + text + "&" + lang;
 
-                //HttpResponseMessage response = await client.GetAsync(url);
 
                 //retrieve the json object and store it as a single string
                 string result = await client.GetStringAsync(url);
@@ -154,8 +155,7 @@ namespace Translator
                 
                 //Convert the image into file stream
                 var stream = file.GetStream();
-                //AnalysisResult analysisResult = await VisionServiceClient.AnalyzeImageAsync(stream, visualFeatures);
-                //var captions = analysisResult.Description.Captions;
+            
 
                 //get the ocr result from the api
                 OcrResults textResult = await VisionServiceClient.RecognizeTextAsync(stream, "en", true);
@@ -166,64 +166,48 @@ namespace Translator
                 return null;
             }
 
-            //Not finished. It is used to recognize handwritten text.
-
-            /*if (textMsg == "")
-                {
-                    HandwritingRecognitionOperation handWriteOp = await VisionServiceClient.CreateHandwritingRecognitionOperationAsync(stream);
-                    HandwritingRecognitionOperationResult handWriteResult = await VisionServiceClient.GetHandwritingRecognitionOperationResultAsync(handWriteOp);
-                    //handWriteResult.RecognitionResult.Lines[0].Words[0].Text;
-                    
-                    foreach(HandwritingTextLine line in handWriteResult.RecognitionResult.Lines)
-                    {
-                        foreach(HandwritingTextWord word in line.Words)
-                        {
-                            textMsg += word.Text + " ";
-                        }
-                    }
-
-                }*/
+            
         }
-
+        /// <summary>
+        /// Get the learn vocab from the easy table hosted in azure
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void BtnGetVocab(object sender, EventArgs e)
         {
-
-            /*MobileServiceClient client = new MobileServiceClient("http://translatorjw.azurewebsites.net");
-            //IMobileServiceTable<FaceBookModel> model = client.GetTable<FaceBookModel>();
-            IMobileServiceTable<VocabModel> vocabTable = client.GetTable<VocabModel>();
-            var content = await vocabTable.ToListAsync();*/
+            this.IsBusy = true;
+           //initialize the result;
             string result = null;
+            //Get the list of content in json from azure.
             List<VocabModel> content = await AzureManager.AzureManagerInstance.GetVocabModel();
+
+            //deserialize the json object and parse it into result string.
             foreach (VocabModel model in content)
             {
                 result += model.SourceText+"\n";
             }
-            await DisplayAlert("Learned Vocab", result, "Ok");
+            this.IsBusy = false;
+            await DisplayAlert("Do you remember these words?", result, "Ok");
         }
 
-       /* private async void BtnAddVocab(object sender, EventArgs e)
-        {
-            VocabModel vocabModel = new VocabModel()
-            {
-                SourceText = "book",
-                TranslateText = "書"
-            };
-            await AzureManager.AzureManagerInstance.AddVocabModel(vocabModel);
-        }
-
-        private void BtnFindWordType(object sender, EventArgs e)
-        {
-            FindWordType("I love apple. It is my favourite fruit");
-        }*/
+        /// <summary>
+        /// Find out the each word type in a sentence.
+        /// </summary>
+        /// <param name="text"></param>
         private async void FindWordType(string text)
         {
             try
             {
-                this.IsBusy = true;
+                //set the loading indicator to true.
+                //this.IsBusy = true;
+                //initialize http client 
                 var client = new HttpClient();
                 string SourceText = text;
+                //parse the uri string
                 string uri = "https://api.textgain.com/1/tag?lang=en&q=" + SourceText;
                 string result = await client.GetStringAsync(uri);
+
+                //deserialize the json object returned from calling the api.
                 var s = (Text)JsonConvert.DeserializeObject(result, typeof(Text));
                 foreach (List<List<WordType>> section in s.data)
                 {
@@ -233,19 +217,23 @@ namespace Translator
                         {
                             string word = wordType.word;
                             string tag = wordType.tag;
+                            //if the word is a noun, then save it to the easy table else not.
                             if (tag == "NOUN")
                             {
+                                //serialize the data into a json object.
                                 VocabModel vocabModel = new VocabModel()
                                 {
                                     SourceText = word
                                     
                                 };
+                                //use POST method to send the json object to the easy table
                                 await AzureManager.AzureManagerInstance.AddVocabModel(vocabModel);
                             }
                         }
                     }
                 }
-                this.IsBusy = false;
+                //turn the loading indicator off.
+               // this.IsBusy = false;
             }
             catch (Exception) { }
         }

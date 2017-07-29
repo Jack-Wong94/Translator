@@ -2,6 +2,9 @@
 
 namespace Translator
 {
+    /// <summary>
+    /// Json model of the word type. It includes the tag of the word (i.e. noun, verb) and the word itself
+    /// </summary>
     public class WordType
     {
         [JsonProperty(PropertyName = "word")]
